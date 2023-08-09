@@ -111,7 +111,8 @@ author_bob.update_rating()
 author_alex.update_rating()
 
 # Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
-best_user = Author.objects.order_by('-rating_author')
+# best_user = Author.objects.order_by('-rating_author')
+best_user = Author.objects.order_by('-rating_author').values('user__username', 'rating_author').first()
 print(best_user[0])
 
 # Вывести дату добавления, username автора, рейтинг, заголовок и
@@ -123,3 +124,18 @@ print(best_post[0])
 best_post_id = best_post.values('id')[0]['id']
 comment_for_post = Comment.objects.filter(post_id=best_post_id)
 print(comment_for_post)
+
+post4 = Post.objects.create(author=Author.objects.get(pk=4),
+                            choice=Post.news,
+                            header='В ЦБ РФ допустили возможность очередного повышения ключевой ставки',
+                            text='Он отметил, что нижняя граница прогноза '
+                                 'диапазона ключевой ставки до конца года составляет 8,5%, '
+                                 'то есть это предусматривает возможность неизменности ставки.'
+                                 'Но если исходить из предыдущего опыта коммуникации, если совет директоров '
+                                 'в релизе допускает возможность повышения ставки на ближайших заседаниях, '
+                                 'то есть вероятность, что это будет сделано уже на следующем'
+
+                            )
+
+category_eco = Category.objects.get(id=3)
+post4.category.add(category_eco)
