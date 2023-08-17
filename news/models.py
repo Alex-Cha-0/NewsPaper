@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from django.db import models
+from django.db.models import Sum
 
 
 class Author(models.Model):
@@ -12,19 +13,29 @@ class Author(models.Model):
         return self.user.username
 
     def update_rating(self):
-        self.rating_author = 0
-        # queryset = Post.objects.filter(author=self.user.id)
-        post_queryset = Post.objects.filter(author=Author.objects.get(user_id=self.user.id))
-        for post_rating in post_queryset:
-            self.rating_author = self.rating_author + post_rating.rating
-            self.save()
-        self.rating_author = self.rating_author * 3
-        self.save()
+        # self.rating_author = 0
+        # # queryset = Post.objects.filter(author=self.user.id)
+        # post_queryset = Post.objects.filter(author=Author.objects.get(user_id=self.user.id))
+        # for post_rating in post_queryset:
+        #     self.rating_author = self.rating_author + post_rating.rating
+        #     self.save()
+        # self.rating_author = self.rating_author * 3
+        # self.save()
+        #
+        # comm_queryset = Comment.objects.filter(user_id=self.user.id)
+        # for comment_rating in comm_queryset:
+        #     self.rating_author = self.rating_author + comment_rating.rating
+        #     self.save()
+        postRat = self.post_set.all().aggregate(postRating=Sum('rating'))
+        pRat = 0
+        pRat += postRat.get('postRating')
 
-        comm_queryset = Comment.objects.filter(user_id=self.user.id)
-        for comment_rating in comm_queryset:
-            self.rating_author = self.rating_author + comment_rating.rating
-            self.save()
+        commentRat = self.user.comment_set.all().aggregate(commentRating=Sum('rating'))
+        cRAt = 0
+        cRAt += commentRat.get('commentRating')
+
+        self.rating_author = pRat * 3 + cRAt
+        self.save()
 
 
 class Category(models.Model):
@@ -84,7 +95,7 @@ class Comment(models.Model):
     rating = models.IntegerField(default=0)
 
     def __str__(self):
-        return f'Date: {self.date_comm} User: {self.user} Rating: {self.rating} Text: {self.text_comm}'
+        return f'Date: {self.date_comm} User: {self.user.username} Rating: {self.rating} Text: {self.text_comm}'
 
     def comment_like(self):
         self.rating = self.rating + 1

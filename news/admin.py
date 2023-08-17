@@ -26,7 +26,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 class PostAdmin(admin.ModelAdmin):
     list_display = (
-        'author', 'choice', 'time_create', 'header', 'text', 'rating')
+        'id','author', 'choice', 'time_create', 'header', 'text', 'rating')
     # list_filter = ('sender_name', 'datetime_send', 'open_order', 'close_order')
     # list_display_links = ('id', 'subject')
     # search_fields = ('subject', 'sender_name')
