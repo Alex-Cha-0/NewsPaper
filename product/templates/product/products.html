@@ -1,60 +1,82 @@
-<!--  наследуемся от шаблона base.html -->
 {% extends 'layout/base.html' %}
-{% load custom_filters %}
-<!-- Название у нас будет products -->
+
 {% block title %}
 Products
 {% endblock title %}
 
-<!-- В контенте на странице мы выводим все товары -->
+
 {% block content %}
 
 <h1>Все продукты</h1>
 {% if products %}
-<h3>{{ time_now|date:'M d Y' }}</h3>
-<!-- Выводим продукты (блюда), только если они есть, с помощью тега if -->
+<!-- Перед таблицей добавим форму для поиска -->
+
+<form method="GET">
+    {{ filter.form }}
+    <!-- Форму от фильтров за нас сделает Django. А вот кнопку, увы, придётся делать самим -->
+    <input class="btn btn-primary" type="submit" value="Найти">
+</form>
 
 <table class="table">
-   <tr>
-       <th scope="col">
-           Название
-       </th>
-       <th scope="col">
-           Описание
-       </th>
-       <th scope="col">
-           Категория
-       </th>
-       <th scope="col">
-           Цена
-       </th>
+    <tr>
+        <th scope="col">
+            Название
+        </th>
+        <th scope="col">
+            Описание
+        </th>
+        <th scope="col">
+            Категория
+        </th>
+        <th scope="col">
+            Цена
+        </th>
+        <th scope="col">
+            Действия
+        </th>
 
-   </tr>
-   {% for product in products %}
-   <!-- Для каждого товара будете генерироваться новая строчка, т.е. новый html-код. При этом сам цикл работает точно так же, как и в python. product -- переменная цикла, т.е. наш товар, взятый из общего списка -->
-   <tr>
-       <td>
-           {{ product.name|multiply:2 }}
-           <!-- Не забываем, что переменные в шаблоне ничем не отличаются от переменных в Python. Здесь также можно получать доступ к полям класса. Например, здесь мы выводим имя, в следующем столбце описание и т.д.  -->
-           <!-- Попробуем умножить название товара на строку а -->
-       </td>
-       <td>
-           {{ product.get_type_display|safe }}
-       </td>
-       <td>
-           {{ product.description|truncatewords:4}}<!-- Дописываем специальный фильтр, чтобы ограничить количество символов до 2 - первая буква + многоточие. -->
-       </td>
-       </td>
-       <td>
-           {{ product.price }}
-       </td>
+    </tr>
+    {% for product in filter.qs %}
 
-   </tr>
-   {% endfor %}
+    <tr>
+        <td>
+            <a href="{% url 'product:product_detail' product.id %}">
+                <!-- здесь
+                    fastfood -- название приложения, которое задано в urls.py с помощью директивы app_name,
+                    product_detail -- название ссылки в списке эндпойнтов urlpatterns,
+                    product.id -- id объекта, который передаётся в качестве через эндпойнт и подставляется вместо <int:pk>
+                        -->
+                {{ product.name }}
+            </a>
+            <!-- При нажатии на название в таблице нас теперь будет перекидывать на страницу с информацией о товаре/продукте -->
+        </td>
+        <td>
+            {{ product.description }}
+        </td>
+        <td>
+            {{ product.get_type_display|safe }}
+        </td>
+        </td>
+        <td>
+            {{ product.price }}
+        </td>
+        <td>
+            <a href="{% url 'product:product_update' product.id %}">
+                Update
+            </a>
+            <a href="{% url 'product:product_delete' product.id %}">
+                Delete
+            </a>
+        </td>
+
+    </tr>
+    {% endfor %}
 </table>
+
+{% include 'product/parts/paginator.html' %}
+
 {% else %}
-<!-- Если продуктов нет, то сообщаем об этом пользователю  -->
-<h2>Продуктов нет!</h2>
+<h2>Еды нет, кушать нечего...</h2>
 {% endif %}
 
 {% endblock content %}

@@ -8,23 +8,34 @@ News
 
 <h2>Всего публикаций: {{ news|length }}</h2>
 <table class="table table-hover">
+    <a href="{% url 'news:post_create' %}">Создать новость</a>
     <thead>
     <tr>
         <th scope="col">#</th>
         <th scope="col">заголовок</th>
         <th scope="col">дата публикации</th>
         <th scope="col">статья</th>
+        <th scope="col">actions</th>
     </tr>
     </thead>
     <tbody>
     {% for news in news %}
     <tr>
         <th scope="row">{{ news.id }}</th>
-        <td>{{ news.header|censor }}</td>
+        <td><a href="{% url 'news:post_detail' news.id %}">{{ news.header|censor }}</a></td>
         <td>{{ news.time_create|date:'d M Y' }}</td>
         <td>{{ news.text|truncatewords:20|censor }}</td>
+        <td>
+            <a href="{% url 'news:post_update' news.id %}">
+                Update
+            </a>
+            <a href="{% url 'news:post_delete' news.id %}">
+                Delete
+            </a>
+        </td>
     </tr>
     {% endfor %}
     </tbody>
 </table>
+{% include 'news/parts/paginator.html' %}
 {% endblock content %}

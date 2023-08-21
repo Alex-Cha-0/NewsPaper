@@ -1,0 +1,29 @@
+{% extends 'layout/base.html' %}
+{% load censor_filter %}
+{% block title %}
+News delete
+{% endblock title %}
+
+{% block content %}
+
+<h3>Delete this post?</h3>
+<div class="card">
+    <div class="card-header">
+        <h3>
+            {{ post.header|censor }}
+        </h3>
+        <div>
+           Time_create: <span class="badge bg-info">{{ post.time_create|date:'d M Y' }}</span>
+            Type: <span class="badge bg-info">{{ post.get_choice_display }}</span>
+        </div>
+    </div>
+    <div class="card-body">
+        {{ post.text|truncatewords:20|censor }}
+    </div>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <input class="btn btn-success" type="submit" value="Delete">
+</form>
+
+{% endblock content %}

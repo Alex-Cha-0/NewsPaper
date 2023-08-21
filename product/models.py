@@ -31,6 +31,9 @@ class Product(models.Model):
     def __str__(self):
         return f'Product #{self.name} - Описание: {self.description[:20]}'
 
+    def get_absolute_url(self):  # добавим абсолютный путь, чтобы после создания нас перебрасывало на страницу с товаром
+        return f'/products/product/{self.id}'
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)

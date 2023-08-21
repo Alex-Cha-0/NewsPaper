@@ -1,0 +1,35 @@
+{% extends 'layout/base.html' %}
+{% load censor_filter %}
+<!-- Название у нас будет products -->
+{% block title %}
+Search
+{% endblock title %}
+
+{% block content %}
+<h2>Всего публикаций: {{ news|length }}</h2>
+
+<form method="GET">
+   {{ filter.form }}
+   <input class="btn btn-primary" type="submit" value="Найти">
+</form>
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">заголовок</th>
+        <th scope="col">дата публикации</th>
+        <th scope="col">статья</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for news in filter.qs %}
+    <tr>
+        <th scope="row">{{ news.id }}</th>
+        <td>{{ news.header|censor }}</td>
+        <td>{{ news.time_create|date:'d M Y' }}</td>
+        <td>{{ news.text|truncatewords:20|censor }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'layout/base.html' %}
+
+
+{% block title %}
+Product
+{% endblock title %}
+
+{% block content %}
+<div class="card">
+ <div class="card-header">
+   <h3>
+     {{ product.name }}
+   </h3>
+   <div>
+     Price: <span class="badge bg-info">{{ product.price }}</span>
+     Type: <span class="badge bg-info">{{ product.get_type_display }}</span>
+   </div>
+ </div>
+ <div class="card-body">
+   {{ product.description }}
+ </div>
+</div>
+
+{% endblock content %}

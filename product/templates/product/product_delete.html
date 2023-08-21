@@ -1,0 +1,30 @@
+{% extends 'layout/base.html' %}
+
+
+{% block title %}
+Product delete
+{% endblock title %}
+
+{% block content %}
+
+<h3>Delete this product?</h3>
+<div class="card">
+    <div class="card-header">
+        <h3>
+            {{ product.name }}
+        </h3>
+        <div>
+            Price: <span class="badge bg-info">{{ product.price }}</span>
+            Type: <span class="badge bg-info">{{ product.get_type_display }}</span>
+        </div>
+    </div>
+    <div class="card-body">
+        {{ product.description }}
+    </div>
+</div>
+<form method="POST">
+    {% csrf_token %}
+    <input class="btn btn-success" type="submit" value="Delete">
+</form>
+
+{% endblock content %}
