@@ -1,4 +1,3 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.urls import reverse_lazy
@@ -17,14 +16,13 @@ class PostList(ListView):
     paginate_by = 10
 
 
-
-class DetailPost(LoginRequiredMixin,DetailView):
+class DetailPost(DetailView):
     model = Post
     template_name = 'news/concrete_news.html'
     context_object_name = 'news'
 
 
-class SearchList(LoginRequiredMixin,ListView):
+class SearchList(ListView):
     model = Post
     template_name = 'news/search.html'
     context_object_name = 'news'
@@ -37,17 +35,17 @@ class SearchList(LoginRequiredMixin,ListView):
         return context
 
 
-class PostDetailView(LoginRequiredMixin,DetailView):
+class PostDetailView(DetailView):
     template_name = 'news/news_detail.html'
     queryset = Post.objects.all()
 
 
-class PostCreateView(LoginRequiredMixin,CreateView):
+class PostCreateView(CreateView):
     template_name = 'news/news_create.html'
     form_class = NewsForm
 
 
-class PostUpdateView(LoginRequiredMixin,UpdateView):
+class PostUpdateView(UpdateView):
     template_name = 'news/news_create.html'
     form_class = NewsForm
 
@@ -58,7 +56,7 @@ class PostUpdateView(LoginRequiredMixin,UpdateView):
 
 
 # дженерик для удаления товара
-class PostDeleteView(LoginRequiredMixin,DeleteView):
+class PostDeleteView(DeleteView):
     template_name = 'news/news_delete.html'
     queryset = Post.objects.all()
     success_url = reverse_lazy(
