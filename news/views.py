@@ -17,7 +17,7 @@ class PostList(ListView):
     paginate_by = 10
 
 
-
+# login Required Mixin add
 class DetailPost(LoginRequiredMixin,DetailView):
     model = Post
     template_name = 'news/concrete_news.html'
