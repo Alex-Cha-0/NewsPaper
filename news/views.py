@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
@@ -49,12 +49,14 @@ class PostDetailView(LoginRequiredMixin,DetailView):
     queryset = Post.objects.all()
 
 
-class PostCreateView(LoginRequiredMixin,CreateView):
+class PostCreateView(PermissionRequiredMixin,CreateView):
+    permission_required = ('news.add_post',)
     template_name = 'news/news_create.html'
     form_class = NewsForm
 
 
-class PostUpdateView(LoginRequiredMixin,UpdateView):
+class PostUpdateView(PermissionRequiredMixin,UpdateView):
+    permission_required = ('news.change_post',)
     template_name = 'news/news_create.html'
     form_class = NewsForm
 

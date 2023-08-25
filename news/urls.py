@@ -9,8 +9,8 @@ urlpatterns = [
     # т.к. сам по себе это класс, то нам надо представить этот класс в виде view. Для этого вызываем метод as_view
     path('<int:pk>', PostDetailView.as_view(), name='post_detail'),
     path('search/', SearchList.as_view(), name='search'),
-    path('news/add/', PostCreateView.as_view(), name='post_create'),
-    path('news/<int:pk>/edit/', PostUpdateView.as_view(), name='post_update'),
-    path('news/<int:pk>/delete/', PostDeleteView.as_view(), name='post_delete'),
-    path('news/upgrade/', upgrade_me, name='upgrade')
+    path('add/', PostCreateView.as_view(), name='post_create'),
+    path('<int:pk>/edit/', PostUpdateView.as_view(), name='post_update'),
+    path('<int:pk>/delete/', PostDeleteView.as_view(), name='post_delete'),
+    path('upgrade/', upgrade_me, name='upgrade')
 ]
