@@ -1,5 +1,7 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.contrib.auth.models import Group
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -9,12 +11,17 @@ from .models import *
 from .sample_app.filters import PostFilter
 
 
-class PostList(ListView):
+class PostList(LoginRequiredMixin,ListView):
     model = Post
     template_name = 'news/news.html'
     context_object_name = 'news'
     queryset = Post.objects.order_by('-time_create')
     paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_authors'] = not self.request.user.groups.filter(name='authors').exists()
+        return context
 
 
 # login Required Mixin add
@@ -63,3 +70,13 @@ class PostDeleteView(LoginRequiredMixin,DeleteView):
     queryset = Post.objects.all()
     success_url = reverse_lazy(
         'news:home')  # не забываем импортировать функцию reverse_lazy из пакета django.urls
+
+
+# Добавляем функциональное представление для повышения привилегий пользователя до членства в группе premium
+@login_required
+def upgrade_me(request):
+   user = request.user
+   premium_group = Group.objects.get(name='authors')
+   if not request.user.groups.filter(name='authors').exists():
+       premium_group.user_set.add(user)
+   return redirect('/')
