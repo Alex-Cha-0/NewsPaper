@@ -4,6 +4,8 @@ from .models import *
 
 # Register your models here.
 
+
+
 class CommentAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'post', 'user', 'text_comm', 'date_comm', 'rating')

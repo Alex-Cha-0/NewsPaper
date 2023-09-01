@@ -12,14 +12,7 @@ News
   </li>
   {% endfor %}
 </ul>
-<p>Вы подписаны на категории:</p>
-{% if category_subscribe %}
-<ul class="list-group">
-    {% for cat_sub in category_subscribe %}
-  <li class="list-group-item list-group-item-success">{{ cat_sub.category }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+
 <h2>Всего публикаций: {{ news|length }}</h2>
 <table class="table table-hover">
     <a href="{% url 'news:post_create' %}">Создать новость</a>
@@ -51,6 +44,6 @@ News
     {% endfor %}
     </tbody>
 </table>
-
+<a class="btn btn-primary btn-sm" href="{% url 'news:subscribe_category' category_id %}">подписаться</a>
 {% include 'news/parts/paginator.html' %}
 {% endblock content %}

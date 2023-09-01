@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Post
+from .models import Post, Category
 from django import forms
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import Group
@@ -10,7 +10,7 @@ class NewsForm(ModelForm):
     # В класс мета, как обычно, надо написать модель, по которой будет строиться форма, и нужные нам поля. Мы уже делали что-то похожее с фильтрами
     class Meta:
         model = Post
-        fields = ['author', 'choice', 'header', 'text']
+        fields = ['author', 'choice', 'header', 'text', 'category']
         widgets = {
             'header': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -25,6 +25,7 @@ class NewsForm(ModelForm):
             'text': forms.Textarea(attrs={
                 'class': 'form-control',
             }),
+            'category': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
 
 

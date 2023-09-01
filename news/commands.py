@@ -19,7 +19,7 @@ category3 = Category.objects.create(category='Экономика')
 category4 = Category.objects.create(category='Авто')
 
 # Добавить 2 статьи и 1 новость.
-post1 = Post.objects.create(author=Author.objects.get(pk=1),
+post1 = Post.objects.create(author=Author.objects.get(pk=6),
                             choice=Post.news_article,
                             header='В России резко '
                                    'возрос экспорт '
@@ -139,3 +139,9 @@ post4 = Post.objects.create(author=Author.objects.get(pk=4),
 
 category_eco = Category.objects.get(id=3)
 post4.category.add(category_eco)
+
+category_eco.subscribers.add('alex')
+Category.objects.filter(subscribers__username='alex')
+User.objects.filter(category__subscribers=4)
+category_auto = Category.objects.get(id=4)
+sub = category_auto.subscribers.all()
