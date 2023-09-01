@@ -78,74 +78,66 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
         'news:home')
 
     def post(self, request, *args, **kwargs):
-        # author = Author.objects.get(id=request.POST['author'])
-        # post = Post(
-        #     author=author,
-        #     choice=request.POST['choice'],
-        #     header=request.POST['header'],
-        #     text=request.POST['text'],
-        # )
-        # post.save()
-        # # Данные созданного поста
-        # data = dict(request.POST)
-        # # Подписчики категории созданного поста
-        # subcribs = {}
-        # # Получаем подписчиков категорий добавленной новости.
-        # for value in data['category']:
-        #     category = Category.objects.get(id=value)
-        #     subscribers = category.subscribers.all()
-        #     subcribs[category] = subscribers
-        #
-        # # получем наш html
-        # html_content = render_to_string(
-        #     'news/subs_users.html',
-        #     {
-        #         'data': data,
-        #     }
-        # )
-
-        send_mail(
-            f'Здравствуй,  Новая статья в твоём любимом разделе!»',
-            'hi',
-            'alexei.chavlitko@yandex.ru',
-            ['spb.roout@gmail.com'],
-            fail_silently=False,
+        author = Author.objects.get(id=request.POST['author'])
+        post = Post(
+            author=author,
+            choice=request.POST['choice'],
+            header=request.POST['header'],
+            text=request.POST['text'],
         )
+        post.save()
+        # Данные созданного поста
+        data = dict(request.POST)
+        print(data)
+        # Подписчики категории созданного поста
+        subcribs = {}
+        # Получаем подписчиков категорий добавленной новости.
+        for value in data['category']:
+            category = Category.objects.get(id=value)
+            subscribers = category.subscribers.all()
+            subcribs[category] = subscribers
 
-
+        # получем наш html
+        html_content = render_to_string(
+            'news/subs_users.html',
+            {
+                'data': post,
+            }
+        )
 
         # Алгоритм отправки сообщений подписчикам категорий!
         seq = 0
-        # for category in subcribs:
-        #     print('Добавление поста в категорию')
-        #     post.category.add(category)
-        #     print(f'Пост добавлен в категорию - {category}')
-        #     subscriber = category.subscribers.values('username', 'email')
-        #     print(f'Получен подписчик на категорию - {category} - {subscriber[seq]["username"]}, {subscriber[seq]["email"]}')
-        #     print('Отправка оповещения о добавления новой статью в любимой категории')
-        #     msg = EmailMultiAlternatives(
-        #         subject=f'Здравствуй, {subscriber[seq]["username"]} Новая статья в твоём любимом разделе!»',
-        #         body=data['text'],
-        #         from_email='alexei.chavlitko@yandex.ru',
-        #         to=[subscriber[seq]['email']],  # это то же, что и recipients_list
-        #     )
-        #     print('Сообщение сформировано')
-        #     msg.attach_alternative(html_content, "text/html")  # добавляем html
-        #     print('Добавлен html')
-        #     msg.send()
-        #     print('Сообщение отправлено')
-        #     print('--------------')
-        #
-        #     # отправляем письмо
-        #     # send_mail(
-        #     #     subject=f'Здравствуй, {subscriber[seq]["username"]} Новая статья в твоём любимом разделе!»',
-        #     #     # имя клиента и дата записи будут в теме для удобства
-        #     #     message=data['text'],  # сообщение с кратким описанием проблемы
-        #     #     from_email='spb.roout@gmail.com',
-        #     #     # здесь указываете почту, с которой будете отправлять (об этом попозже)
-        #     #     recipient_list=[subscriber[seq]['email']]  # здесь список получателей. Например, секретарь, сам врач и так далее
-        #     # )
-        #     seq += 1
+        for category in subcribs:
+            print('Добавление поста в категорию')
+            post.category.add(category)
+            print(f'Пост добавлен в категорию - {category}')
+            subscriber = category.subscribers.values('username', 'email')
+            print(
+                f'Получен подписчик на категорию - {category} - {subscriber[seq]["username"]}, {subscriber[seq]["email"]}')
+            print('Отправка оповещения о добавления новой статью в любимой категории')
+            msg = EmailMultiAlternatives(
+                subject=f'Здравствуй, {subscriber[seq]["username"]} Новая статья в твоём любимом разделе!»',
+                body=str(data['text']),
+                from_email='alexei.chavlitko@yandex.ru',
+                to=[subscriber[seq]['email']]
+            )
+            print('Сообщение сформировано')
+            msg.attach_alternative(html_content, "text/html")  # добавляем html
+            print('Добавлен html')
+            msg.send()
+            print('Сообщение отправлено')
+            print('--------------')
+
+            # отправляем письмо
+            # send_mail(
+            #     subject=f'Здравствуй, {subscriber[seq]["username"]} Новая статья в твоём любимом разделе!»',
+            #     # имя клиента и дата записи будут в теме для удобства
+            #     message=str(data['text']),  # сообщение с кратким описанием проблемы
+            #     from_email='alexei.chavlitko@yandex.ru',
+            #     # здесь указываете почту, с которой будете отправлять (об этом попозже)
+            #     recipient_list=[subscriber[seq]['email']]  # здесь список получателей. Например, секретарь, сам врач и так далее
+            # )
+            seq += 1
 
         return redirect('news:post_create')
 
