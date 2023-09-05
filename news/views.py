@@ -12,6 +12,10 @@ from .forms import NewsForm
 from .models import *
 from .sample_app.filters import PostFilter
 
+from django.db.models.signals import post_save
+
+
+
 
 class CategoryList(ListView):
     model = Category
@@ -114,7 +118,7 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
             subscriber = category.subscribers.values('username', 'email')
             print(
                 f'Получен подписчик на категорию - {category} - {subscriber[seq]["username"]}, {subscriber[seq]["email"]}')
-            print('Отправка оповещения о добавления новой статью в любимой категории')
+            print('Отправка оповещения о добавления новой статьи в любимой категории')
             msg = EmailMultiAlternatives(
                 subject=f'Здравствуй, {subscriber[seq]["username"]} Новая статья в твоём любимом разделе!»',
                 body=str(data['text']),
@@ -127,16 +131,6 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
             msg.send()
             print('Сообщение отправлено')
             print('--------------')
-
-            # отправляем письмо
-            # send_mail(
-            #     subject=f'Здравствуй, {subscriber[seq]["username"]} Новая статья в твоём любимом разделе!»',
-            #     # имя клиента и дата записи будут в теме для удобства
-            #     message=str(data['text']),  # сообщение с кратким описанием проблемы
-            #     from_email='alexei.chavlitko@yandex.ru',
-            #     # здесь указываете почту, с которой будете отправлять (об этом попозже)
-            #     recipient_list=[subscriber[seq]['email']]  # здесь список получателей. Например, секретарь, сам врач и так далее
-            # )
             seq += 1
 
         return redirect('news:post_create')
