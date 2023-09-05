@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'news',
+    'news.apps.NewsConfig',
     'product',
     'django_filters',
     'widget_tweaks',

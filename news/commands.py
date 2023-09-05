@@ -145,3 +145,4 @@ Category.objects.filter(subscribers__username='alex')
 User.objects.filter(category__subscribers=4)
 category_auto = Category.objects.get(id=4)
 sub = category_auto.subscribers.all()
+

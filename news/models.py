@@ -64,7 +64,7 @@ class Post(models.Model):
 
     def __str__(self):
         return f'Дата добавления - {self.time_create} - Author: {self.author} - Raiting: ' \
-               f'{self.rating} - Header: {self.header} - Preview: {self.preview}'
+               f'{self.rating} - Header: {self.header} - Preview: {self.preview} Category: {self.category.count()}'
 
     def post_like(self):
         self.rating = self.rating + 1
