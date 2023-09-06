@@ -2,10 +2,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from django.core.mail import EmailMultiAlternatives, send_mail
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from .forms import NewsForm
@@ -13,8 +15,6 @@ from .models import *
 from .sample_app.filters import PostFilter
 
 from django.db.models.signals import post_save
-
-
 
 
 class CategoryList(ListView):
@@ -89,57 +89,70 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
             header=request.POST['header'],
             text=request.POST['text'],
         )
-        post.save()
-        data = dict(request.POST)
-        print(data)
-        # Данные созданного поста
-        # data = dict(request.POST)
-        # print(data)
-        # # Подписчики категории созданного поста
-        # subcribs = {}
-        # # Получаем подписчиков категорий добавленной новости.
-        # for value in data['category']:
-        #     category = Category.objects.get(id=value)
-        #     subscribers = category.subscribers.all()
-        #     subcribs[category] = subscribers
-        #
-        # # получем наш html
-        # html_content = render_to_string(
-        #     'news/subs_users.html',
-        #     {
-        #         'data': post,
-        #     }
-        # )
-        #
-        # # Алгоритм отправки сообщений подписчикам категорий!
-        # seq = 0
-        # for category in subcribs:
-        #     print('Добавление поста в категорию')
-        #     post.category.add(category)
-        #     print(f'Пост добавлен в категорию - {category}')
-        #     subscriber = category.subscribers.values('username', 'email')
-        #     for subsc in subscriber:
-        #         print(subsc)
-        #         print(
-        #             f'Получен подписчик на категорию - {category} - {subsc["username"]}, {subsc["email"]}')
-        #         print('Отправка оповещения о добавления новой статьи в любимой категории')
-        #
-        #         msg = EmailMultiAlternatives(
-        #             subject=f'Здравствуй, {subsc["username"]} Новая статья в твоём любимом разделе!»',
-        #             body=str(data['text']),
-        #             from_email='alexei.chavlitko@yandex.ru',
-        #             to=[subsc["email"]]
-        #         )
-        #         print('Сообщение сформировано')
-        #         msg.attach_alternative(html_content, "text/html")  # добавляем html
-        #         print('Добавлен html')
-        #         msg.send()
-        #         print('Сообщение отправлено')
-        #         print('--------------')
-        #
-        #     seq += 1
+        post_author_count = Post.objects.filter(author_id=author.id, time_create__date=timezone.now()).count()
+        if post_author_count <= 3:
+            post.save()
 
-        return redirect('news:post_create')
+            categoryes = request.POST.getlist('category')
+            for cat in categoryes:
+                cat_obj = Category.objects.get(id=cat)
+                post.category.add(cat_obj)
+
+            return redirect('news:post_create')
+        else:
+            return redirect('news:erorr')
+
+
+    #     data = dict(request.POST)
+
+    # Данные созданного поста
+    # data = dict(request.POST)
+    # print(data)
+    # # Подписчики категории созданного поста
+    # subcribs = {}
+    # # Получаем подписчиков категорий добавленной новости.
+    # for value in data['category']:
+    #     category = Category.objects.get(id=value)
+    #     subscribers = category.subscribers.all()
+    #     subcribs[category] = subscribers
+    #
+    # # получем наш html
+    # html_content = render_to_string(
+    #     'news/subs_users.html',
+    #     {
+    #         'data': post,
+    #     }
+    # )
+    #
+    # # Алгоритм отправки сообщений подписчикам категорий!
+    # seq = 0
+    # for category in subcribs:
+    #     print('Добавление поста в категорию')
+    #     post.category.add(category)
+    #     print(f'Пост добавлен в категорию - {category}')
+    #     subscriber = category.subscribers.values('username', 'email')
+    #     for subsc in subscriber:
+    #         print(subsc)
+    #         print(
+    #             f'Получен подписчик на категорию - {category} - {subsc["username"]}, {subsc["email"]}')
+    #         print('Отправка оповещения о добавления новой статьи в любимой категории')
+    #
+    #         msg = EmailMultiAlternatives(
+    #             subject=f'Здравствуй, {subsc["username"]} Новая статья в твоём любимом разделе!»',
+    #             body=str(data['text']),
+    #             from_email='alexei.chavlitko@yandex.ru',
+    #             to=[subsc["email"]]
+    #         )
+    #         print('Сообщение сформировано')
+    #         msg.attach_alternative(html_content, "text/html")  # добавляем html
+    #         print('Добавлен html')
+    #         msg.send()
+    #         print('Сообщение отправлено')
+    #         print('--------------')
+    #
+    #     seq += 1
+
+    # return redirect('news:post_create')
 
 
 class PostUpdateView(PermissionRequiredMixin, UpdateView):
@@ -180,3 +193,7 @@ def subscribe_category(request, category_id):
     if not Category.objects.filter(subscribers__username=user).exists():
         category.subscribers.add(user)
     return redirect('/')
+
+
+def error(request):
+    return HttpResponse("Превишен лимит создания постов", status=400, reason="Limits")

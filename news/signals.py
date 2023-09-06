@@ -1,13 +1,38 @@
-from django.db.models.signals import post_save
+from django.core.mail import EmailMultiAlternatives
+from django.db.models.signals import post_save, m2m_changed
+from django.core.signals import request_finished
 from django.dispatch import receiver  # импортируем нужный декоратор
-from .models import Post
+from django.template.loader import render_to_string
+
+from .models import Post, Category
 
 
-@receiver(post_save, sender=Post)
-def notify_managers_appointment(sender, instance, created, **kwargs):
-    print(instance)
-    print(instance.author)
-    print(instance.choice)
-    print(instance.category)
-
+@receiver(m2m_changed, sender=Post.category.through)
+def update_post(sender, **kwargs):
+    instance = kwargs.pop('instance', None)
+    categories = kwargs['pk_set']  # Категории добавленного поста
+    if kwargs.get('action') == 'post_add':
+        # получем наш html
+        html_content = render_to_string(
+            'news/subs_users.html',
+            {
+                'data': instance,
+            }
+        )
+        for value in categories:
+            category = Category.objects.get(id=value)  # Обьект Категории
+            subscribers = category.subscribers.all()  # Подписчики одной категории
+            for data in subscribers:
+                msg = EmailMultiAlternatives(
+                    subject=f'Здравствуй, {data.username} Новая статья в твоём любимом разделе!»',
+                    body=str(instance.text),
+                    from_email='alexei.chavlitko@yandex.ru',
+                    to=[data.email]
+                )
+                print('Сообщение сформировано')
+                msg.attach_alternative(html_content, "text/html")  # добавляем html
+                print('Добавлен html')
+                msg.send()
+                print('Сообщение отправлено')
+                print('--------------')
 
