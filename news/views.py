@@ -31,6 +31,8 @@ class CategoryList(ListView):
         context['category'] = Category.objects.all()
         context['category_id'] = category_id
         context['category_subscribe'] = Category.objects.filter(subscribers__username=self.request.user.username)
+        context['if_not_subscribe'] = Category.objects.filter(subscribers__category=category_id,
+                                                              subscribers__username=self.request.user.username)
         return context
 
 
@@ -39,7 +41,7 @@ class PostList(LoginRequiredMixin, ListView):
     template_name = 'news/news.html'
     context_object_name = 'news'
     queryset = Post.objects.order_by('-time_create')
-    paginate_by = 10
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -89,6 +91,7 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
             header=request.POST['header'],
             text=request.POST['text'],
         )
+        # Число созданных постов за сегодня
         post_author_count = Post.objects.filter(author_id=author.id, time_create__date=timezone.now()).count()
         if post_author_count <= 3:
             post.save()
@@ -101,58 +104,6 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
             return redirect('news:post_create')
         else:
             return redirect('news:erorr')
-
-
-    #     data = dict(request.POST)
-
-    # Данные созданного поста
-    # data = dict(request.POST)
-    # print(data)
-    # # Подписчики категории созданного поста
-    # subcribs = {}
-    # # Получаем подписчиков категорий добавленной новости.
-    # for value in data['category']:
-    #     category = Category.objects.get(id=value)
-    #     subscribers = category.subscribers.all()
-    #     subcribs[category] = subscribers
-    #
-    # # получем наш html
-    # html_content = render_to_string(
-    #     'news/subs_users.html',
-    #     {
-    #         'data': post,
-    #     }
-    # )
-    #
-    # # Алгоритм отправки сообщений подписчикам категорий!
-    # seq = 0
-    # for category in subcribs:
-    #     print('Добавление поста в категорию')
-    #     post.category.add(category)
-    #     print(f'Пост добавлен в категорию - {category}')
-    #     subscriber = category.subscribers.values('username', 'email')
-    #     for subsc in subscriber:
-    #         print(subsc)
-    #         print(
-    #             f'Получен подписчик на категорию - {category} - {subsc["username"]}, {subsc["email"]}')
-    #         print('Отправка оповещения о добавления новой статьи в любимой категории')
-    #
-    #         msg = EmailMultiAlternatives(
-    #             subject=f'Здравствуй, {subsc["username"]} Новая статья в твоём любимом разделе!»',
-    #             body=str(data['text']),
-    #             from_email='alexei.chavlitko@yandex.ru',
-    #             to=[subsc["email"]]
-    #         )
-    #         print('Сообщение сформировано')
-    #         msg.attach_alternative(html_content, "text/html")  # добавляем html
-    #         print('Добавлен html')
-    #         msg.send()
-    #         print('Сообщение отправлено')
-    #         print('--------------')
-    #
-    #     seq += 1
-
-    # return redirect('news:post_create')
 
 
 class PostUpdateView(PermissionRequiredMixin, UpdateView):
@@ -174,15 +125,18 @@ class PostDeleteView(PermissionRequiredMixin, DeleteView):
     template_name = 'news/news_delete.html'
     queryset = Post.objects.all()
     success_url = reverse_lazy(
-        'news:home')  # не забываем импортировать функцию reverse_lazy из пакета django.urls
-
+        'news:home')
 
 # Добавляем функциональное представление для повышения привилегий пользователя до членства в группе authors
+
+
 @login_required
 def upgrade_me(request):
     user = request.user
     premium_group = Group.objects.get(name='authors')
+
     if not request.user.groups.filter(name='authors').exists():
+        Author.objects.create(user=user)
         premium_group.user_set.add(user)
     return redirect('/')
 
@@ -192,7 +146,7 @@ def subscribe_category(request, category_id):
     category = Category.objects.get(id=category_id)
     if not Category.objects.filter(subscribers__username=user).exists():
         category.subscribers.add(user)
-    return redirect('/')
+    return redirect(f'/{category_id}/category/')
 
 
 def error(request):

@@ -13,19 +13,6 @@ class Author(models.Model):
         return self.user.username
 
     def update_rating(self):
-        # self.rating_author = 0
-        # # queryset = Post.objects.filter(author=self.user.id)
-        # post_queryset = Post.objects.filter(author=Author.objects.get(user_id=self.user.id))
-        # for post_rating in post_queryset:
-        #     self.rating_author = self.rating_author + post_rating.rating
-        #     self.save()
-        # self.rating_author = self.rating_author * 3
-        # self.save()
-        #
-        # comm_queryset = Comment.objects.filter(user_id=self.user.id)
-        # for comment_rating in comm_queryset:
-        #     self.rating_author = self.rating_author + comment_rating.rating
-        #     self.save()
         postRat = self.post_set.all().aggregate(postRating=Sum('rating'))
         pRat = 0
         pRat += postRat.get('postRating')
@@ -63,8 +50,9 @@ class Post(models.Model):
     rating = models.IntegerField(default=0)
 
     def __str__(self):
-        return f'Дата добавления - {self.time_create} - Author: {self.author} - Raiting: ' \
-               f'{self.rating} - Header: {self.header} - Preview: {self.preview} Category: {self.category.count()}'
+        # return f'Дата добавления - {self.time_create} - Author: {self.author} - Raiting: ' \
+        #        f'{self.rating} - Header: {self.header} - Preview: {self.preview} Category: {self.category.count()}'
+        return f'{self.pk}'
 
     def post_like(self):
         self.rating = self.rating + 1

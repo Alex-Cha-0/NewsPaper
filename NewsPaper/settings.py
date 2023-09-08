@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'product',
     'django_filters',
     'widget_tweaks',
+    'django_apscheduler',
 ]
 
 MIDDLEWARE = [
@@ -161,3 +162,9 @@ MANAGERS = [
 SERVER_EMAIL = 'alexei.chavlitko@yandex.ru'
 
 DEFAULT_FROM_EMAIL = 'alexei.chavlitko@yandex.ru'
+
+# формат даты, которую будет воспринимать наш задачник(вспоминаем урок по фильтрам)
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+# если задача не выполняется за 25 секунд, то она автоматически снимается, можете поставить время побольше, но как правило, это сильно бьёт по производительности сервера
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds

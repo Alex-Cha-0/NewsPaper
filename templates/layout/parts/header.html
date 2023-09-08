@@ -8,7 +8,7 @@
             </a>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                <li><a href="{% url 'news:home' %}" class="nav-link px-2 text-secondary">Home</a></li>
+                <li><a href="{% url 'news:home' %}" class="nav-link px-2 text-white">Главная</a></li>
                 <li><a href="{% url 'news:search' %}" class="nav-link px-2 text-white">SEARCH</a></li>
                 {% if request.user.is_authenticated %}
                 {% else %}
@@ -21,9 +21,7 @@
                     Стать автором!
                 </a>
                 {% else %}
-                <h3>
-                    Вы стали автором
-                </h3>
+                <p class="nav-link px-2 text-white">Вы автор</p>
                 {% endif %}
 
             </ul>

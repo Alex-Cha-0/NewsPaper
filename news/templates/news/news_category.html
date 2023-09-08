@@ -1,49 +1,59 @@
 {% extends 'layout/default.html' %}
 {% load censor_filter %}
 {% block title %}
-News
+    News
 {% endblock title %}
-<!-- В контенте на странице мы выводим сам продукт, первичный ключ которого был передан в адрес -->
-{% block content %}
-<ul class="nav nav-tabs">
-    {% for cat in category %}
-  <li class="nav-item">
-    <a class="nav-link" aria-current="page" href="{% url 'news:category' cat.id %}">{{ cat.category }}</a>
-  </li>
-  {% endfor %}
-</ul>
 
-<h2>Всего публикаций: {{ news|length }}</h2>
-<table class="table table-hover">
-    <a href="{% url 'news:post_create' %}">Создать новость</a>
-    <thead>
-    <tr>
-        <th scope="col">#</th>
-        <th scope="col">заголовок</th>
-        <th scope="col">дата публикации</th>
-        <th scope="col">статья</th>
-        <th scope="col">actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for news in news %}
-    <tr>
-        <th scope="row">{{ news.id }}</th>
-        <td><a href="{% url 'news:post_detail' news.id %}">{{ news.header|censor }}</a></td>
-        <td>{{ news.time_create|date:'d M Y' }}</td>
-        <td>{{ news.text|truncatewords:20|censor }}</td>
-        <td>
-            <a href="{% url 'news:post_update' news.id %}">
-                Update
-            </a>
-            <a href="{% url 'news:post_delete' news.id %}">
-                Delete
-            </a>
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<a class="btn btn-primary btn-sm" href="{% url 'news:subscribe_category' category_id %}">подписаться</a>
-{% include 'news/parts/paginator.html' %}
+{% block content %}
+    <ul class="nav nav-tabs">
+        {% for cat in category %}
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{% url 'news:category' cat.id %}">{{ cat.category }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Всего публикаций: {{ news|length }}</h2>
+    <table class="table table-hover">
+
+        <div class="d-grid gap-2 d-md-block">
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'news:post_create' %}">Создать новость</a>
+            {% if not if_not_subscribe %}
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'news:subscribe_category' category_id %}">Подписаться</a>
+                {% else %}
+                <span class="text-success">Вы подписаны</span>
+            {% endif %}
+        </div>
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">автор поста</th>
+            <th scope="col">заголовок</th>
+            <th scope="col">дата публикации</th>
+            <th scope="col">статья</th>
+            <th scope="col">actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for post in news %}
+            <tr>
+                <th scope="row">{{ post.id }}</th>
+                <td>{{ post.author }}</td>
+                <td><a href="{% url 'news:post_detail' post.id %}">{{ post.header|censor }}</a></td>
+                <td>{{ post.time_create|date:'d M Y' }}</td>
+                <td>{{ post.text|truncatewords:20|censor }}</td>
+                <td>
+                    <a href="{% url 'news:post_update' post.id %}">
+                        Update
+                    </a>
+                    <a href="{% url 'news:post_delete' post.id %}">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% include 'news/parts/paginator.html' %}
 {% endblock content %}
