@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import Group
+from django.core.cache import cache
 from django.core.mail import EmailMultiAlternatives, send_mail
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -75,6 +76,18 @@ class PostDetailView(LoginRequiredMixin, DetailView):
     template_name = 'news/news_detail.html'
     queryset = Post.objects.all()
 
+    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+        obj = cache.get(f'news{self.kwargs["pk"]}',
+                        None)  # кэш очень похож на словарь, и метод get действует также. Он забирает значение по
+        # ключу, если его нет, то забирает None.
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        print(obj)
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'news{self.kwargs["pk"]}', obj)
+
+        return obj
+
 
 class PostCreateView(PermissionRequiredMixin, CreateView):
     permission_required = ('news.add_post',)
@@ -126,6 +139,7 @@ class PostDeleteView(PermissionRequiredMixin, DeleteView):
     queryset = Post.objects.all()
     success_url = reverse_lazy(
         'news:home')
+
 
 # Добавляем функциональное представление для повышения привилегий пользователя до членства в группе authors
 

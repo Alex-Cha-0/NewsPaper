@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 
 from django.db import models
 from django.db.models import Sum
@@ -27,7 +28,7 @@ class Author(models.Model):
 
 class Category(models.Model):
     category = models.CharField(max_length=255, unique=True)
-    subscribers = models.ManyToManyField(User)
+    subscribers = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
         return self.category
@@ -72,6 +73,10 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return f'/news/{self.id}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
+        cache.delete(f'news-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
 
 
 class PostCategory(models.Model):

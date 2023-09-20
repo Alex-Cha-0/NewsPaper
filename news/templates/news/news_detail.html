@@ -1,25 +1,26 @@
 {% extends 'layout/default.html' %}
 {% load censor_filter %}
-
+{% load cache %}
 {% block title %}
-Post
+    Post
 {% endblock title %}
 
 {% block content %}
-<div class="card">
- <div class="card-header">
-   <h3>
-     {{ post.header|censor }}
-   </h3>
-   <div>
-     Author: <span class="badge bg-info">{{ post.author }}</span>
-     Create: <span class="badge bg-info">{{ post.time_create }}</span>
-     Type: <span class="badge bg-info">{{ post.get_choice_display }}</span>
-   </div>
- </div>
- <div class="card-body">
-   {{ post.text|censor  }}
- </div>
-</div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>
+                    {{ post.header|censor }}
+                </h3>
+                <div>
+                    Author: <span class="badge bg-info">{{ post.author }}</span>
+                    Create: <span class="badge bg-info">{{ post.time_create }}</span>
+                    Type: <span class="badge bg-info">{{ post.get_choice_display }}</span>
+                </div>
+            </div>
+            <div class="card-body">
+                {{ post.text|censor }}
+            </div>
+        </div>
 
 {% endblock content %}
