@@ -14,15 +14,17 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .forms import NewsForm
 from .models import *
 from .sample_app.filters import PostFilter
-
+import logging
 from django.db.models.signals import post_save
+
+logger = logging.getLogger(__name__)
 
 
 class CategoryList(ListView):
     model = Category
     template_name = 'news/news_category.html'
     queryset = Category.objects.all()
-    paginate_by = 10
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         context = super(CategoryList, self).get_context_data(**kwargs)
@@ -81,7 +83,6 @@ class PostDetailView(LoginRequiredMixin, DetailView):
                         None)  # кэш очень похож на словарь, и метод get действует также. Он забирает значение по
         # ключу, если его нет, то забирает None.
         # если объекта нет в кэше, то получаем его и записываем в кэш
-        print(obj)
         if not obj:
             obj = super().get_object(queryset=self.queryset)
             cache.set(f'news{self.kwargs["pk"]}', obj)
@@ -108,6 +109,7 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
         post_author_count = Post.objects.filter(author_id=author.id, time_create__date=timezone.now()).count()
         if post_author_count <= 3:
             post.save()
+            logger.warning(f'Post created by {author}, id - {post}')
 
             categoryes = request.POST.getlist('category')
             for cat in categoryes:
@@ -116,6 +118,7 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
 
             return redirect('news:post_create')
         else:
+            logger.info(f'Post creation limit exceeded by - {author}')
             return redirect('news:erorr')
 
 

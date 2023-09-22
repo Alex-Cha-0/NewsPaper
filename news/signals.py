@@ -26,7 +26,7 @@ def update_post(sender, **kwargs):
             for data in subscribers:
                 msg = EmailMultiAlternatives(
                     subject=f'Здравствуй, {data.username} Новая статья в твоём любимом разделе!»',
-                    body=str(instance.text),
+                    body=instance.text,
                     from_email='alexei.chavlitko@yandex.ru',
                     to=[data.email]
                 )

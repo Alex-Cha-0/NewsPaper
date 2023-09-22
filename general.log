@@ -1,0 +1,7 @@
+2023-09-22 11:30:02,056 - INFO - autoreload - Watching for file changes with StatReloader
+2023-09-22 11:30:02,266 - INFO - basehttp - "GET /16 HTTP/1.1" 200 3013
+2023-09-22 11:30:02,280 - WARNING - basehttp - "GET /assets/css/style.css HTTP/1.1" 404 4145
+2023-09-22 11:30:03,506 - INFO - basehttp - "GET /16 HTTP/1.1" 200 3013
+2023-09-22 11:30:03,517 - WARNING - basehttp - "GET /assets/css/style.css HTTP/1.1" 404 4145
+2023-09-22 11:49:07,611 - INFO - autoreload - D:\pythonProject\skillfactory\NewsPaper\NewsPaper\settings.py changed, reloading.
+2023-09-22 11:49:08,033 - INFO - autoreload - Watching for file changes with StatReloader
